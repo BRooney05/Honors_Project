@@ -1,6 +1,6 @@
 import pygame as pg
 from sys import exit
-from settings import screen_width, screen_height, width_center, height_center, screen_center, num_characters
+from settings import screen_width, screen_height, width_center, height_center, screen_center, num_characters, fps
 from setup import screen, pairs, tick
 import Graphics.graphics as gfx
 
@@ -335,11 +335,8 @@ def play_week(week):
 
 def truth_booth(week, person1 = None, circle1_center = None, person2 = None, circle2_center = None):
     
-    bg = pg.surface.Surface((screen_width, screen_height))
-    bg.fill('white')
-
     text_boxes = pg.sprite.Group()
-    text_boxes.add(Text('Fonts/Coolvetica.otf', 150, f'Week {week}: Enter the Booth', True, 'pink', (width_center, screen_height//10)))
+    text_boxes.add(Text('Fonts/Coolvetica.otf', 150, f'Week {week}: Enter the Booth', True, 'pink', (width_center, screen_height//10), filled = True))
 
     people = pg.sprite.Group()
     people.add(Person(gfx.man1_png, "Mark", (screen_width//(num_characters+2)*2, screen_height//2.75), scalar = 0.25))
@@ -354,7 +351,7 @@ def truth_booth(week, person1 = None, circle1_center = None, person2 = None, cir
         text_boxes.add(Text('Fonts/Coolvetica.otf', 50, person.get_name(), True, 'pink', (person.get_rect().center[0], person.get_rect().center[1] + screen_height//7)))
 
     if person2:
-        text_boxes.add(Text('Fonts/Coolvetica.otf', screen_height//10, 'SEND THEM TO THE BOOTH', True, 'pink', (width_center, 95*(screen_height//100)), clicked_function = booth_reveal))
+        text_boxes.add(Text('Fonts/Coolvetica.otf', screen_height//10, 'SEND THEM TO THE BOOTH', True, 'pink', (width_center, 95*(screen_height//100)), clicked_function = booth_reveal, filled = True))
 
     while True:
 
@@ -383,7 +380,7 @@ def truth_booth(week, person1 = None, circle1_center = None, person2 = None, cir
                             elif person.get_name() == person2.get_name():
                                 return
         
-        blit_background(bg)
+        blit_background(gfx.tb_bg)
 
         if person1:
             pg.draw.circle(screen, color = 'pink', center = circle1_center, radius = person1.get_rect().width//1.75)
@@ -391,6 +388,7 @@ def truth_booth(week, person1 = None, circle1_center = None, person2 = None, cir
                 pg.draw.circle(screen, color = 'pink', center = circle2_center, radius = person1.get_rect().width//1.75)
         
         people.draw(screen)
+        text_boxes.update()
         text_boxes.draw(screen)
 
         tick()
@@ -590,7 +588,17 @@ def open_settings():
     while True:
         
         text_boxes = pg.sprite.Group()
-        text_boxes.add(Text('Fonts/Easter Season.otf', 50, 'hi', True, 'white', screen_center))
+        text_boxes.add(Text('Fonts/Coolvetica.otf', 150, 'Settings', True, 'pink', (width_center, screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 90, f'Screen Dimensions: {screen_width}x{screen_height}', True, 'pink', (width_center, 3.5*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 90, f'FPS: {fps}', True, 'pink', (width_center, 6*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 90, f'Number of Characters: {num_characters}', True, 'pink', (width_center, 8.5*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 90, f'Game Mode:', True, 'pink', (width_center, 11*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 70, f'Easy', True, 'pink', (int(width_center*0.85), 12.5*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica Condensed.otf', 70, f'Hard', True, 'pink', (int(width_center*1.15), 12.5*screen_height//15)))
+        text_boxes.add(Text('Fonts/Coolvetica.otf', 40, ' Back to Title', True, 'Pink', (0, 0), location = 'topleft', clicked_function = title_screen))
+
+        bg = pg.surface.Surface((screen_width, screen_height))
+        bg.fill('white')
 
         for event in pg.event.get():
             check_quit(event)
@@ -600,7 +608,9 @@ def open_settings():
                     if text_box.get_rect().collidepoint(pg.mouse.get_pos()):
                         text_box.clicked()
 
-        screen.blit(gfx.boat_png, screen_center)
+        blit_background(bg)
+        pg.draw.line(screen, 'pink', (int(width_center*0.65), screen_height//7), (int(width_center*1.35), screen_height//7), screen_height//150)
+        text_boxes.draw(screen)
         
         tick()
   
